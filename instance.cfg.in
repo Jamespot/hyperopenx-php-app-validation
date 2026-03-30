@@ -1,5 +1,5 @@
 [buildout]
-parts = directories php-config php-service php-promise
+parts = directories app-service publish-connection-parameter
 
 [directories]
 recipe = slapos.cookbook:makedirectory
@@ -7,38 +7,13 @@ var = ${buildout:directory}/var
 etc = ${buildout:directory}/etc
 log = ${buildout:directory}/var/log
 
-[php-config]
-recipe = slapos.recipe.template:jinja2
-template = inline:
-  ; PHP app config
-  host = {{ configuration.host }}
-  port = {{ configuration.port }}
-  document_root = {{ configuration.document_root }}
-rendered = ${directories:etc}/php-app.conf
-mode = 600
-context =
-  key configuration.host instance-parameter:configuration.host
-  key configuration.port instance-parameter:configuration.port
-  key configuration.document_root instance-parameter:configuration.document_root
-
-[php-service]
+[app-service]
 recipe = slapos.cookbook:wrapper
-command-line = ${php:location}/bin/php -S ${instance-parameter:configuration.host}:${instance-parameter:configuration.port} -t ${instance-parameter:configuration.document_root}
+command-line = php -S ${:host}:${:port} -t ${buildout:parts-directory}/app
 wrapper-path = ${directories:etc}/run-php
-
-[instance-parameter]
-configuration.host = 0.0.0.0
-configuration.port = 8080
-configuration.document_root = ${buildout:parts-directory}/app
+host = ${slap-network-information:global-ipv6}
+port = 8080
 
 [publish-connection-parameter]
 recipe = slapos.cookbook:publish
-host = ${instance-parameter:configuration.host}
-port = ${instance-parameter:configuration.port}
-
-[php-promise]
-recipe = slapos.cookbook:promise.plugin
-module = check_php
-output = ${directories:etc}/plugin/check_php.py
-config-host = ${instance-parameter:configuration.host}
-config-port = ${instance-parameter:configuration.port}
+url = http://[${app-service:host}]:${app-service:port}
