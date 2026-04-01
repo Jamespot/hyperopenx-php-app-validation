@@ -9,7 +9,6 @@ offline = true
 [switch-softwaretype]
 recipe = slapos.cookbook:switch-softwaretype
 default = instance-php:output
-RootSoftwareInstance = ${:default}
 
 [instance-php]
 recipe = slapos.recipe.template
