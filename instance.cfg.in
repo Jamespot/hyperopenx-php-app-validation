@@ -6,11 +6,24 @@ eggs-directory = {{ buildout['eggs-directory'] }}
 develop-eggs-directory = {{ buildout['develop-eggs-directory'] }}
 offline = true
 
+[slap-configuration]
+recipe = slapos.cookbook:slapconfiguration
+computer = ${slap-connection:computer-id}
+partition = ${slap-connection:partition-id}
+url = ${slap-connection:server-url}
+key = ${slap-connection:key-file}
+cert = ${slap-connection:cert-file}
+
 [switch-softwaretype]
 recipe = slapos.cookbook:switch-softwaretype
-default = instance-php:output
+default = dynamic-template-php:output
 
-[instance-php]
-recipe = slapos.recipe.template
+[dynamic-template-php]
+recipe = slapos.recipe.template:jinja2
 url = {{ instance_php }}
-output = ${buildout:directory}/instance-php.cfg
+output = ${buildout:parts-directory}/${:_buildout_section_name_}/instance-php.cfg
+context =
+    key eggs_directory buildout:eggs-directory
+    key develop_eggs_directory buildout:develop-eggs-directory
+    section slap_connection slap-connection
+    key slapparameter_dict slap-configuration:configuration

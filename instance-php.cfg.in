@@ -1,12 +1,12 @@
 [buildout]
 parts =
   directory
-  php-app
+  php-index
   php-wrapper
   publish-connection-parameter
 
-eggs-directory = {{ buildout['eggs-directory'] }}
-develop-eggs-directory = {{ buildout['develop-eggs-directory'] }}
+eggs-directory = {{ eggs_directory }}
+develop-eggs-directory = {{ develop_eggs_directory }}
 offline = true
 
 [slap-configuration]
@@ -28,10 +28,10 @@ services = ${:etc}/service
 www = ${:srv}/www
 log = ${:var}/log
 
-[php-app]
-recipe = plone.recipe.command
-command = echo '<?php echo "Hello, SlapOS!";' > ${directory:www}/index.php
-stop-on-error = true
+[php-index]
+recipe = slapos.recipe.template
+inline = <?php echo "Hello, SlapOS!";
+output = ${directory:www}/index.php
 
 [php-wrapper]
 recipe = slapos.cookbook:wrapper
