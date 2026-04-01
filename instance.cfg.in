@@ -1,19 +1,17 @@
 [buildout]
-parts = directories app-service publish-connection-parameter
+parts =
+  switch-softwaretype
 
-[directories]
-recipe = slapos.cookbook:makedirectory
-var = ${buildout:directory}/var
-etc = ${buildout:directory}/etc
-log = ${buildout:directory}/var/log
+eggs-directory = ${buildout:eggs-directory}
+develop-eggs-directory = ${buildout:develop-eggs-directory}
+offline = true
 
-[app-service]
-recipe = slapos.cookbook:wrapper
-command-line = php -S ${:host}:${:port} -t ${buildout:parts-directory}/app
-wrapper-path = ${directories:etc}/run-php
-host = ${slap-network-information:global-ipv6}
-port = 8080
+[switch-softwaretype]
+recipe = slapos.cookbook:switch-softwaretype
+default = instance-php:output
+RootSoftwareInstance = ${:default}
 
-[publish-connection-parameter]
-recipe = slapos.cookbook:publish
-url = http://[${app-service:host}]:${app-service:port}
+[instance-php]
+recipe = slapos.recipe.template
+url = {{ instance_php }}
+output = ${buildout:directory}/instance-php.cfg
